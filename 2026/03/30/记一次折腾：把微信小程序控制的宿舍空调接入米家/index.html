@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <!-- so meta -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <meta name="description" content="记一次折腾：把微信小程序控制的宿舍空调接入米家宿舍里的空调用的是海享汇，平时只能用指定的微信小程序控制，没法接入米家。对于习惯了语音控制的人来说确实不太方便。为了能让小爱同学使唤它，我这几天折腾了一下，自己写了个服务把它接进去了。 这里简单记录一下整个探索过程和踩的坑，权当是个复盘。 第一步：抓包找接口想自己控制设备，第一步肯定得先搞清楚小程序是怎么发指令的。 我用手机抓了一下包，在小程序里点了几">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次折腾：把微信小程序控制的宿舍空调接入米家">
+<meta property="og:url" content="http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/index.html">
+<meta property="og:site_name" content="Greenhats&#39; Blog">
+<meta property="og:description" content="记一次折腾：把微信小程序控制的宿舍空调接入米家宿舍里的空调用的是海享汇，平时只能用指定的微信小程序控制，没法接入米家。对于习惯了语音控制的人来说确实不太方便。为了能让小爱同学使唤它，我这几天折腾了一下，自己写了个服务把它接进去了。 这里简单记录一下整个探索过程和踩的坑，权当是个复盘。 第一步：抓包找接口想自己控制设备，第一步肯定得先搞清楚小程序是怎么发指令的。 我用手机抓了一下包，在小程序里点了几">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-30T08:43:14.000Z">
+<meta property="article:modified_time" content="2026-03-30T08:44:49.941Z">
+<meta property="article:author" content="Greenhats">
+<meta name="twitter:card" content="summary">
+    
+      
+        
+          
+                    <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/Green-hats/Green-hats.github.io@v0.1/images/icon_new.png">
+                    
+                      
+                        
+                          
+                                    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/Green-hats/Green-hats.github.io@v0.1/images/icon_new.png"
+                                      sizes="192x192">
+                                    
+                                      
+                                        
+                                          
+                                                    <link rel="apple-touch-icon" sizes="180x180"
+                                                      href="https://cdn.jsdelivr.net/gh/Green-hats/Green-hats.github.io@v0.1/images/icon_new.png">
+                                                    
+                                                      
+                                                        
+                                                          <!-- title -->
+                                                          <title>
+                                                            记一次折腾：把微信小程序控制的宿舍空调接入米家
+                                                          </title>
+                                                          <!-- async scripts -->
+                                                          <!-- Google Analytics -->
+
+
+                                                            <!-- Umami Analytics -->
+
+
+                                                              <!-- styles -->
+                                                              
+<link rel="stylesheet" href="/css/style.css">
+
+                                                                <!-- persian styles -->
+                                                                
+                                                                      <!-- rss -->
+                                                                      
+                                                                            
+                                                                                <!-- mathjax -->
+                                                                                
+                                                                                    <link rel="stylesheet"
+                                                                                      href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" />
+<meta name="generator" content="Hexo 8.1.1"></head>
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Green-hats">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2026/03/23/hello-world/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&text=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&is_video=false&description=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=记一次折腾：把微信小程序控制的宿舍空调接入米家&body=Check out this article: http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&name=记一次折腾：把微信小程序控制的宿舍空调接入米家&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&t=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6"><span class="toc-number">1.</span> <span class="toc-text">记一次折腾：把微信小程序控制的宿舍空调接入米家</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E6%8A%93%E5%8C%85%E6%89%BE%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">第一步：抓包找接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E7%94%A8%E5%B7%B4%E6%B3%95%E4%BA%91%E5%81%9A%E4%B8%AD%E8%BD%AC"><span class="toc-number">1.2.</span> <span class="toc-text">第二步：用巴法云做中转</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E7%94%A8-Go-%E8%AF%AD%E8%A8%80%E5%86%99%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.3.</span> <span class="toc-text">第三步：用 Go 语言写本地服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9ADocker-%E9%83%A8%E7%BD%B2%E4%B8%8E-scratch-%E9%95%9C%E5%83%8F"><span class="toc-number">1.4.</span> <span class="toc-text">第四步：Docker 部署与 scratch 镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E4%B8%A4%E4%B8%AA%E5%9D%91"><span class="toc-number">1.5.</span> <span class="toc-text">第五步：意料之外的两个坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-number">1.7.</span> <span class="toc-text">附录</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        记一次折腾：把微信小程序控制的宿舍空调接入米家
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Greenhats</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-30T08:43:14.000Z" class="dt-published" itemprop="datePublished">2026-03-30</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="记一次折腾：把微信小程序控制的宿舍空调接入米家"><a href="#记一次折腾：把微信小程序控制的宿舍空调接入米家" class="headerlink" title="记一次折腾：把微信小程序控制的宿舍空调接入米家"></a>记一次折腾：把微信小程序控制的宿舍空调接入米家</h1><p>宿舍里的空调用的是海享汇，平时只能用指定的微信小程序控制，没法接入米家。对于习惯了语音控制的人来说确实不太方便。为了能让小爱同学使唤它，我这几天折腾了一下，自己写了个服务把它接进去了。</p>
+<p>这里简单记录一下整个探索过程和踩的坑，权当是个复盘。</p>
+<h2 id="第一步：抓包找接口"><a href="#第一步：抓包找接口" class="headerlink" title="第一步：抓包找接口"></a>第一步：抓包找接口</h2><p>想自己控制设备，第一步肯定得先搞清楚小程序是怎么发指令的。</p>
+<p>我用手机抓了一下包，在小程序里点了几下空调开关，很容易就找到了对应的 HTTP 请求。接口大概长这样：</p>
+<ul>
+<li>发送 <code>POST</code> 请求到 <code>https://api.haixianghui.com/api/air/remote/open/设备ID</code> 就是开机。</li>
+<li>把 <code>open</code> 换成 <code>close</code> 就是关机。</li>
+</ul>
+<p>请求头里最关键的一个参数是 <code>Authorization: Bearer &lt;Token&gt;</code>。这个 Token 就是身份凭证，只要拿到它和设备 ID，我们就可以自己发请求了。我首先顺手用 Python 写了几行代码试了一下，确实能成功开关机，这就说明接口可以脱离小程序独立调用。</p>
+<h2 id="第二步：用巴法云做中转"><a href="#第二步：用巴法云做中转" class="headerlink" title="第二步：用巴法云做中转"></a>第二步：用巴法云做中转</h2><p>接口有了，怎么把它连到米家呢？这里我用到了智能家居玩家比较熟悉的“巴法云（Bemfa）”。</p>
+<p>米家 App 是原生支持绑定巴法云账号的。我在巴法云控制台建了一个以 <code>002</code> 结尾的主题（在巴法云的规则里，002 代表开关类设备）。建好之后，米家 App 里就会同步出现一个虚拟开关。</p>
+<p>接下来的整体思路就很清晰了：米家点开关 -&gt; 指令发给巴法云 -&gt; 我在本地跑个程序监听巴法云 -&gt; 收到指令后去请求空调的接口。</p>
+<h2 id="第三步：用-Go-语言写本地服务"><a href="#第三步：用-Go-语言写本地服务" class="headerlink" title="第三步：用 Go 语言写本地服务"></a>第三步：用 Go 语言写本地服务</h2><p>这个本地监听服务我打算放在宿舍里的飞牛 NAS（Linux 系统）上跑。为了省事，不想在 NAS 上折腾 Python 环境和依赖，我选了 Go 语言。</p>
+<p>代码逻辑主要分两块：</p>
+<ol>
+<li>建一个 TCP 客户端连上巴法云的 <code>8344</code> 端口，订阅刚才建的主题，并保持一个 30 秒一次的心跳防掉线。</li>
+<li>只要 TCP 收到 <code>msg=on</code> 或 <code>msg=off</code> 的消息，就去调第一步抓包拿到的 HTTP 接口。</li>
+</ol>
+<p>写完之后，利用 Go 的交叉编译，敲一行命令就能打出一个独立的 Linux 二进制文件：</p>
+<p>Bash</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o air-bridge main.go</span><br></pre></td></tr></table></figure>
+
+<p>加上 <code>CGO_ENABLED=0</code> 强制静态编译后，这个文件不需要任何外部依赖就能跑，非常清爽。</p>
+<h2 id="第四步：Docker-部署与-scratch-镜像"><a href="#第四步：Docker-部署与-scratch-镜像" class="headerlink" title="第四步：Docker 部署与 scratch 镜像"></a>第四步：Docker 部署与 scratch 镜像</h2><p>既然要在 NAS 上跑，为了不弄脏宿主机环境，肯定要用 Docker 部署。</p>
+<p>本来想用常规的 <code>alpine</code> 作为基础镜像，但遇上了老大难的网络问题，拉取镜像一直卡死在获取元数据那一步。后来转念一想，我的 Go 程序已经是纯静态编译了，根本不需要 Linux 系统的底层库，那我为什么还要下个操作系统？</p>
+<p>于是我直接换成了 Docker 自带的 <code>scratch</code> 镜像。它是一个 0 字节的空白镜像，完全不需要联网下载。Dockerfile 简单到只有四行：</p>
+<p>Dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FROM scratch</span><br><span class="line">WORKDIR /app</span><br><span class="line">COPY air-bridge .</span><br><span class="line">CMD [&quot;./air-bridge&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>这样一改，打包瞬间完成，而且最终生成的 Docker 镜像不到 10MB。配合 <code>docker-compose.yml</code> 把配置文件挂载进去，以后 Token 过期了直接在外面改文本就能热更新。</p>
+<h2 id="第五步：意料之外的两个坑"><a href="#第五步：意料之外的两个坑" class="headerlink" title="第五步：意料之外的两个坑"></a>第五步：意料之外的两个坑</h2><p>本以为这就顺利搞定了，结果在实际测试的时候，接连踩了两个坑：</p>
+<p><strong>坑一：HTTPS 证书报错</strong></p>
+<p>运行后日志里提示 <code>x509: certificate signed by unknown authority</code>。</p>
+<p>原因是 <code>scratch</code> 镜像实在太空了，连操作系统自带的“根证书信任列表”都没有，导致 Go 发起 HTTPS 请求时验证不了服务器的证书。解决办法也简单粗暴，既然是自己抓的接口，我直接在 Go 代码的 HTTP 客户端里加了个 <code>InsecureSkipVerify: true</code>，跳过证书校验。</p>
+<p><strong>坑二：改了代码却没生效</strong></p>
+<p>我在本地改完证书跳过的代码后，重新用 <code>docker compose up --build</code> 打包，发现还是报上面那个错。</p>
+<p>排查了半天反应过来：我在本地改了源码，但Docker 打包时直接用了带旧代码的缓存镜像。最后把旧文件删了，重新编译生成，终于成功上线。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>搞定之后，对小爱同学喊一句开空调，几乎是秒响应，体验挺好。这次折腾不仅把没法接入生态的设备拉了进来，还顺便实践了一把 Go 的静态编译和极轻量的 <code>scratch</code> 镜像部署，算是一个挺实用的小项目。</p>
+<hr>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>GO语言主程序：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bufio&quot;</span></span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;crypto/tls&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">	_ <span class="string">&quot;time/tzdata&quot;</span> <span class="comment">// 适配 scratch 镜像，内置时区数据</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Config 对应 config.json 结构</span></span><br><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span> &#123;</span><br><span class="line">	DeviceID   <span class="type">string</span> <span class="string">`json:&quot;device_id&quot;`</span></span><br><span class="line">	Token      <span class="type">string</span> <span class="string">`json:&quot;token&quot;`</span></span><br><span class="line">	BemfaUID   <span class="type">string</span> <span class="string">`json:&quot;bemfa_uid&quot;`</span></span><br><span class="line">	BemfaTopic <span class="type">string</span> <span class="string">`json:&quot;bemfa_topic&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> config Config</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">loadConfig</span><span class="params">(path <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">	file, err := os.Open(path)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;无法打开配置文件: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line">	<span class="keyword">if</span> err := json.NewDecoder(file).Decode(&amp;config); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;解析配置文件失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送控制指令到海享汇 API</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sendAirCommand</span><span class="params">(action <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">	url := fmt.Sprintf(<span class="string">&quot;https://api.haixianghui.com/api/air/remote/%s/%s&quot;</span>, action, config.DeviceID)</span><br><span class="line">	req, _ := http.NewRequest(<span class="string">&quot;POST&quot;</span>, url, bytes.NewBuffer(<span class="literal">nil</span>))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 模拟小程序请求头</span></span><br><span class="line">	req.Header.Set(<span class="string">&quot;Authorization&quot;</span>, <span class="string">&quot;Bearer &quot;</span>+config.Token)</span><br><span class="line">	req.Header.Set(<span class="string">&quot;requestfrom&quot;</span>, <span class="string">&quot;wx_ma&quot;</span>)</span><br><span class="line">	req.Header.Set(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 关键：忽略 HTTPS 证书校验（解决 scratch 镜像无根证书问题）</span></span><br><span class="line">	tr := &amp;http.Transport&#123;</span><br><span class="line">		TLSClientConfig: &amp;tls.Config&#123;InsecureSkipVerify: <span class="literal">true</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	client := &amp;http.Client&#123;Timeout: <span class="number">10</span> * time.Second, Transport: tr&#125;</span><br><span class="line"></span><br><span class="line">	resp, err := client.Do(req)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;[API] 请求异常: %v\n&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> resp.Body.Close()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> resp.StatusCode == <span class="number">200</span> &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;[API] 成功：空调已执行 %s 操作\n&quot;</span>, action)</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;[API] 失败，状态码: %d\n&quot;</span>, resp.StatusCode)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 维持巴法云 TCP 连接与心跳</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startBemfaClient</span><span class="params">()</span></span> &#123;</span><br><span class="line">	address := <span class="string">&quot;bemfa.com:8344&quot;</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		conn, err := net.DialTimeout(<span class="string">&quot;tcp&quot;</span>, address, <span class="number">10</span>*time.Second)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">&quot;[TCP] 连接失败: %v，5秒后重试...\n&quot;</span>, err)</span><br><span class="line">			time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 订阅主题</span></span><br><span class="line">		subMsg := fmt.Sprintf(<span class="string">&quot;cmd=1&amp;uid=%s&amp;topic=%s\r\n&quot;</span>, config.BemfaUID, config.BemfaTopic)</span><br><span class="line">		conn.Write([]<span class="type">byte</span>(subMsg))</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 开启心跳协程</span></span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				time.Sleep(<span class="number">30</span> * time.Second)</span><br><span class="line">				<span class="keyword">if</span> _, err := conn.Write([]<span class="type">byte</span>(<span class="string">&quot;ping\r\n&quot;</span>)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">					<span class="keyword">return</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 循环读取指令</span></span><br><span class="line">		reader := bufio.NewReader(conn)</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			line, err := reader.ReadString(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			msg := strings.TrimSpace(line)</span><br><span class="line">			<span class="keyword">if</span> strings.Contains(msg, <span class="string">&quot;msg=on&quot;</span>) &#123;</span><br><span class="line">				sendAirCommand(<span class="string">&quot;open&quot;</span>)</span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span> strings.Contains(msg, <span class="string">&quot;msg=off&quot;</span>) &#123;</span><br><span class="line">				sendAirCommand(<span class="string">&quot;close&quot;</span>)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		conn.Close()</span><br><span class="line">		time.Sleep(<span class="number">5</span> * time.Second)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	os.Setenv(<span class="string">&quot;TZ&quot;</span>, <span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">	loadConfig(<span class="string">&quot;./config.json&quot;</span>)</span><br><span class="line">	log.Println(<span class="string">&quot;=== 运行版本：V2 (已跳过证书校验) ===&quot;</span>)</span><br><span class="line">	log.Println(<span class="string">&quot;=== 桥接服务启动 ===&quot;</span>)</span><br><span class="line">	startBemfaClient()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/Green-hats">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6"><span class="toc-number">1.</span> <span class="toc-text">记一次折腾：把微信小程序控制的宿舍空调接入米家</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E6%8A%93%E5%8C%85%E6%89%BE%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">第一步：抓包找接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E7%94%A8%E5%B7%B4%E6%B3%95%E4%BA%91%E5%81%9A%E4%B8%AD%E8%BD%AC"><span class="toc-number">1.2.</span> <span class="toc-text">第二步：用巴法云做中转</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E7%94%A8-Go-%E8%AF%AD%E8%A8%80%E5%86%99%E6%9C%AC%E5%9C%B0%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.3.</span> <span class="toc-text">第三步：用 Go 语言写本地服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9ADocker-%E9%83%A8%E7%BD%B2%E4%B8%8E-scratch-%E9%95%9C%E5%83%8F"><span class="toc-number">1.4.</span> <span class="toc-text">第四步：Docker 部署与 scratch 镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E4%B8%A4%E4%B8%AA%E5%9D%91"><span class="toc-number">1.5.</span> <span class="toc-text">第五步：意料之外的两个坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95"><span class="toc-number">1.7.</span> <span class="toc-text">附录</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&text=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&is_video=false&description=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=记一次折腾：把微信小程序控制的宿舍空调接入米家&body=Check out this article: http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&title=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&name=记一次折腾：把微信小程序控制的宿舍空调接入米家&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2026/03/30/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%8A%98%E8%85%BE%EF%BC%9A%E6%8A%8A%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E7%9A%84%E5%AE%BF%E8%88%8D%E7%A9%BA%E8%B0%83%E6%8E%A5%E5%85%A5%E7%B1%B3%E5%AE%B6/&t=记一次折腾：把微信小程序控制的宿舍空调接入米家"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2026
+    Greenhats
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Green-hats">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+            
+              <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+                
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
